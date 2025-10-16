@@ -23,30 +23,22 @@ import java.util.Map;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.loader.api.Version;
 import net.fabricmc.loader.api.metadata.ModDependency;
+import net.fabricmc.loader.api.metadata.ModMetadata;
 
 /**
  * Internal variant of the ModMetadata interface.
  */
-@SuppressWarnings("deprecation")
-public interface LoaderModMetadata extends net.fabricmc.loader.metadata.LoaderModMetadata {
+public interface LoaderModMetadata extends ModMetadata {
 	int getSchemaVersion();
-
-	default String getOldStyleLanguageAdapter() {
-		return "net.fabricmc.loader.language.JavaLanguageAdapter";
-	}
 
 	Map<String, String> getLanguageAdapterDefinitions();
 	Collection<NestedJarEntry> getJars();
 	Collection<String> getMixinConfigs(EnvType type);
 	/* @Nullable */
 	String getAccessWidener();
-	@Override
 	boolean loadsInEnvironment(EnvType type);
 
-	Collection<String> getOldInitializers();
-	@Override
 	List<EntrypointMetadata> getEntrypoints(String type);
-	@Override
 	Collection<String> getEntrypointKeys();
 
 	void emitFormatWarnings();

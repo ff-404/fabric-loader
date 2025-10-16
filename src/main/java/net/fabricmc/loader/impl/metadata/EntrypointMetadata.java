@@ -16,10 +16,9 @@
 
 package net.fabricmc.loader.impl.metadata;
 
-@SuppressWarnings("deprecation")
-public interface EntrypointMetadata extends net.fabricmc.loader.metadata.EntrypointMetadata {
-	@Override
+public interface EntrypointMetadata {
+
 	String getAdapter();
-	@Override
+
 	String getValue();
 }

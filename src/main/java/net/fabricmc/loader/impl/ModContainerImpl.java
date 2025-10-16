@@ -37,8 +37,7 @@ import net.fabricmc.loader.impl.util.FileSystemUtil;
 import net.fabricmc.loader.impl.util.log.Log;
 import net.fabricmc.loader.impl.util.log.LogCategory;
 
-@SuppressWarnings("deprecation")
-public class ModContainerImpl extends net.fabricmc.loader.ModContainer {
+public class ModContainerImpl implements ModContainer {
 	private final LoaderModMetadata info;
 	private final ModOrigin origin;
 	private final List<Path> codeSourcePaths;
@@ -73,7 +72,6 @@ public class ModContainerImpl extends net.fabricmc.loader.ModContainer {
 		return origin;
 	}
 
-	@Override
 	public List<Path> getCodeSourcePaths() {
 		return codeSourcePaths;
 	}
@@ -199,12 +197,6 @@ public class ModContainerImpl extends net.fabricmc.loader.ModContainer {
 		}
 
 		return ret;
-	}
-
-	@Deprecated
-	@Override
-	public LoaderModMetadata getInfo() {
-		return info;
 	}
 
 	@Override
