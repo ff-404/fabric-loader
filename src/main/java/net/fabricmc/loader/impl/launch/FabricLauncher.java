@@ -26,7 +26,6 @@ import java.util.jar.Manifest;
 import net.fabricmc.api.EnvType;
 
 public interface FabricLauncher {
-	MappingConfiguration getMappingConfiguration();
 
 	void addToClassPath(Path path, String... allowedPrefixes);
 	void setAllowedPrefixes(Path path, String... prefixes);

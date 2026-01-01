@@ -42,8 +42,6 @@ import net.fabricmc.loader.impl.launch.knot.MixinServiceKnot;
 import net.fabricmc.loader.impl.launch.knot.MixinServiceKnotBootstrap;
 import net.fabricmc.loader.impl.util.log.Log;
 import net.fabricmc.loader.impl.util.log.LogCategory;
-import net.fabricmc.loader.impl.util.mappings.MixinIntermediaryDevRemapper;
-import net.fabricmc.mappingio.tree.MappingTree;
 
 public final class FabricMixinBootstrap {
 	private FabricMixinBootstrap() { }
@@ -59,30 +57,6 @@ public final class FabricMixinBootstrap {
 		System.setProperty("mixin.service", MixinServiceKnot.class.getName());
 
 		MixinBootstrap.init();
-
-		if (FabricLauncherBase.getLauncher().isDevelopment()) {
-			MappingConfiguration config = FabricLauncherBase.getLauncher().getMappingConfiguration();
-			MappingTree mappings = config.getMappings();
-			final String modNs = config.getDefaultModDistributionNamespace();
-			String runtimeNs = config.getRuntimeNamespace();
-
-			if (config.hasAnyMappings() && !modNs.equals(runtimeNs)) {
-				List<String> namespaces = new ArrayList<>(mappings.getDstNamespaces());
-				namespaces.add(mappings.getSrcNamespace());
-
-				if (namespaces.contains(modNs) && namespaces.contains(runtimeNs)) {
-					System.setProperty("mixin.env.remapRefMap", "true");
-
-					try {
-						MixinIntermediaryDevRemapper remapper = new MixinIntermediaryDevRemapper(mappings, modNs, runtimeNs);
-						MixinEnvironment.getDefaultEnvironment().getRemappers().add(remapper);
-						Log.info(LogCategory.MIXIN, "Loaded Fabric development mappings for mixin remapper!");
-					} catch (Exception e) {
-						Log.error(LogCategory.MIXIN, "Fabric development environment setup error - the game will probably crash soon!", e);
-					}
-				}
-			}
-		}
 
 		Map<String, ModContainerImpl> configToModMap = new HashMap<>();
 

@@ -30,11 +30,10 @@ import net.fabricmc.loader.impl.launch.FabricLauncherBase;
 public final class FabricTransformer {
 	public static byte[] transform(boolean isDevelopment, EnvType envType, String name, byte[] bytes) {
 		Set<BuiltinTransform> transforms = FabricLoaderImpl.INSTANCE.getGameProvider().getBuiltinTransforms(name);
-		boolean transformAccess = transforms.contains(BuiltinTransform.WIDEN_ALL_PACKAGE_ACCESS) && FabricLauncherBase.getLauncher().getMappingConfiguration().requiresPackageAccessHack();
 		boolean environmentStrip = transforms.contains(BuiltinTransform.STRIP_ENVIRONMENT);
 		boolean applyClassTweaker = transforms.contains(BuiltinTransform.CLASS_TWEAKS) && FabricLoaderImpl.INSTANCE.getClassTweaker().getTargets().contains(name.replace('.', '/'));
 
-		if (!transformAccess && !environmentStrip && !applyClassTweaker) {
+		if (!environmentStrip && !applyClassTweaker) {
 			return bytes;
 		}
 
@@ -45,11 +44,6 @@ public final class FabricTransformer {
 
 		if (applyClassTweaker) {
 			visitor = FabricLoaderImpl.INSTANCE.getClassTweaker().createClassVisitor(FabricLoaderImpl.ASM_VERSION, visitor, null); // TODO: generated classes?
-			visitorCount++;
-		}
-
-		if (transformAccess) {
-			visitor = new PackageAccessFixer(FabricLoaderImpl.ASM_VERSION, visitor);
 			visitorCount++;
 		}
 

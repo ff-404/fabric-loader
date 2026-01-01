@@ -32,14 +32,10 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.classtweaker.api.ClassTweaker;
 import net.fabricmc.loader.impl.util.UrlConversionException;
 import net.fabricmc.loader.impl.util.UrlUtil;
-import net.fabricmc.mappingio.tree.MappingTree;
-import net.fabricmc.tinyremapper.TinyRemapper;
 
 enum LoaderLibrary {
 	FABRIC_LOADER(UrlUtil.LOADER_CODE_SOURCE),
-	MAPPING_IO(MappingTree.class),
 	SPONGE_MIXIN(MixinBootstrap.class),
-	TINY_REMAPPER(TinyRemapper.class),
 	CLASS_TWEAKER(ClassTweaker.class),
 	ASM(ClassReader.class),
 	ASM_ANALYSIS(Analyzer.class),

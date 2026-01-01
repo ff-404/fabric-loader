@@ -55,11 +55,9 @@ import net.fabricmc.loader.impl.discovery.ModCandidateImpl;
 import net.fabricmc.loader.impl.discovery.ModDiscoverer;
 import net.fabricmc.loader.impl.discovery.ModResolutionException;
 import net.fabricmc.loader.impl.discovery.ModResolver;
-import net.fabricmc.loader.impl.discovery.RuntimeModRemapper;
 import net.fabricmc.loader.impl.entrypoint.EntrypointStorage;
 import net.fabricmc.loader.impl.game.GameProvider;
 import net.fabricmc.loader.impl.launch.FabricLauncherBase;
-import net.fabricmc.loader.impl.launch.MappingConfiguration;
 import net.fabricmc.loader.impl.launch.knot.Knot;
 import net.fabricmc.loader.impl.metadata.DependencyOverrides;
 import net.fabricmc.loader.impl.metadata.EntrypointMetadata;
@@ -99,7 +97,6 @@ public final class FabricLoaderImpl implements FabricLoader {
 
 	private Object gameInstance;
 
-	private MappingResolver mappingResolver;
 	private GameProvider provider;
 	private Path gameDir;
 	private Path configDir;
@@ -243,14 +240,6 @@ public final class FabricLoaderImpl implements FabricLoader {
 		Path outputdir = cacheDir.resolve(PROCESSED_MODS_DIR_NAME);
 
 		// runtime mod remapping
-
-		if (remapRegularMods) {
-			if (System.getProperty(SystemProperties.REMAP_CLASSPATH_FILE) == null) {
-				Log.warn(LogCategory.MOD_REMAP, "Runtime mod remapping disabled due to no fabric.remapClasspathFile being specified. You may need to update loom.");
-			} else {
-				RuntimeModRemapper.remap(modCandidates, cacheDir.resolve(TMP_DIR_NAME), outputdir);
-			}
-		}
 
 		// shuffle mods in-dev to reduce the risk of false order reliance, apply late load requests
 
@@ -416,19 +405,6 @@ public final class FabricLoaderImpl implements FabricLoader {
 		if (exception != null) {
 			throw exception;
 		}
-	}
-
-	@Override
-	public MappingResolver getMappingResolver() {
-		if (mappingResolver == null) {
-			MappingConfiguration config = FabricLauncherBase.getLauncher().getMappingConfiguration();
-			String runtimeNamespace = config.getRuntimeNamespace();
-
-			mappingResolver = new LazyMappingResolver(() -> new MappingResolverImpl(config.getMappings(), runtimeNamespace),
-					runtimeNamespace);
-		}
-
-		return mappingResolver;
 	}
 
 	@Override

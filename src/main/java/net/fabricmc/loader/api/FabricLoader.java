@@ -135,17 +135,6 @@ public interface FabricLoader {
 	ObjectShare getObjectShare();
 
 	/**
-	 * Get the current mapping resolver.
-	 *
-	 * <p>When performing reflection, a mod should always query the mapping resolver for
-	 * the remapped names of members than relying on other heuristics.</p>
-	 *
-	 * @return the current mapping resolver instance
-	 * @since 0.4.1
-	 */
-	MappingResolver getMappingResolver();
-
-	/**
 	 * Gets the container for a given mod.
 	 *
 	 * @param id the ID of the mod

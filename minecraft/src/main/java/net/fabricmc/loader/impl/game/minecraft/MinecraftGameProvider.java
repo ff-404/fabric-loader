@@ -49,7 +49,6 @@ import net.fabricmc.loader.impl.game.minecraft.patch.EntrypointPatchFML125;
 import net.fabricmc.loader.impl.game.minecraft.patch.TinyFDPatch;
 import net.fabricmc.loader.impl.game.patch.GameTransformer;
 import net.fabricmc.loader.impl.launch.FabricLauncher;
-import net.fabricmc.loader.impl.launch.MappingConfiguration;
 import net.fabricmc.loader.impl.metadata.BuiltinModMetadata;
 import net.fabricmc.loader.impl.metadata.ModDependencyImpl;
 import net.fabricmc.loader.impl.util.Arguments;
@@ -314,68 +313,6 @@ public class MinecraftGameProvider implements GameProvider {
 	@Override
 	public void initialize(FabricLauncher launcher) {
 		launcher.setValidParentClassPath(validParentClassPath);
-
-		MappingConfiguration config = launcher.getMappingConfiguration();
-		String runtimeNs = config.getRuntimeNamespace();
-		String gameNs = System.getProperty(SystemProperties.GAME_MAPPING_NAMESPACE);
-
-		if (gameNs == null) {
-			gameNs = MappingConfiguration.OFFICIAL_NAMESPACE; // default
-
-			if (config.hasAnyMappings()) {
-				List<String> mappingNamespaces = config.getNamespaces();
-
-				if (mappingNamespaces != null) {
-					if (launcher.isDevelopment()
-							&& mappingNamespaces.contains(MappingConfiguration.NAMED_NAMESPACE)) { // dev with named (e.g. yarn)
-						gameNs = MappingConfiguration.NAMED_NAMESPACE;
-					} else if (!mappingNamespaces.contains(MappingConfiguration.OFFICIAL_NAMESPACE)) { // prod with old mc that didn't use the same mappings for client and server jars
-						gameNs = envType == EnvType.CLIENT ? MappingConfiguration.CLIENT_OFFICIAL_NAMESPACE : MappingConfiguration.SERVER_OFFICIAL_NAMESPACE;
-					}
-				}
-			}
-		}
-
-		Log.debug(LogCategory.GAME_PROVIDER, "namespace detection result: game=%s runtime=%s mod-default=%s", gameNs, runtimeNs, config.getDefaultModDistributionNamespace());
-
-		if (!gameNs.equals(runtimeNs)) { // game is obfuscated / in another namespace -> remap
-			Map<String, Path> obfJars = new HashMap<>(3);
-			String[] names = new String[gameJars.size()];
-
-			for (int i = 0; i < gameJars.size(); i++) {
-				String name;
-
-				if (i == 0) {
-					name = envType.name().toLowerCase(Locale.ENGLISH);
-				} else if (i == 1) {
-					name = "common";
-				} else {
-					name = String.format(Locale.ENGLISH, "extra-%d", i - 2);
-				}
-
-				obfJars.put(name, gameJars.get(i));
-				names[i] = name;
-			}
-
-			if (realmsJar != null) {
-				obfJars.put("realms", realmsJar);
-			}
-
-			obfJars = GameProviderHelper.deobfuscate(obfJars,
-					gameNs,
-					getGameId(), getNormalizedGameVersion(),
-					getLaunchDirectory(),
-					launcher);
-
-			for (int i = 0; i < gameJars.size(); i++) {
-				Path newJar = obfJars.get(names[i]);
-				Path oldJar = gameJars.set(i, newJar);
-
-				if (logJars.remove(oldJar)) logJars.add(newJar);
-			}
-
-			realmsJar = obfJars.get("realms");
-		}
 
 		// Load the logger libraries on the platform CL when in a unit test
 		if (!logJars.isEmpty() && !Boolean.getBoolean(SystemProperties.UNIT_TEST)) {
