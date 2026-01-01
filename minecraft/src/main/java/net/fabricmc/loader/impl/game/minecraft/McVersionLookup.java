@@ -166,16 +166,6 @@ public final class McVersionLookup {
 					return;
 				}
 			}
-
-			// classic: version-like String constant used in Minecraft.init, Minecraft referenced by field in MinecraftApplet
-			String type;
-
-			if (((is = cp.getInputStream("net/minecraft/client/MinecraftApplet.class")) != null || (is = cp.getInputStream("com/mojang/minecraft/MinecraftApplet.class")) != null)
-					&& (type = analyze(is, new FieldTypeCaptureVisitor())) != null
-					&& (is = cp.getInputStream(type.concat(".class"))) != null
-					&& fromAnalyzer(is, new MethodConstantVisitor("init"), builder)) {
-				return;
-			}
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

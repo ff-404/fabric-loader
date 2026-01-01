@@ -72,7 +72,6 @@ public class EntrypointPatch extends GamePatch {
 
 		String gameEntrypoint = null;
 		boolean serverHasFile = true;
-		boolean isApplet = entrypoint.contains("Applet");
 		ClassNode mainClass = classSource.apply(entrypoint);
 
 		if (mainClass == null) {
@@ -210,7 +209,7 @@ public class EntrypointPatch extends GamePatch {
 					}
 				}
 
-				if (type == EnvType.CLIENT && !isApplet && gmCandidate.name.equals("run")) {
+				if (type == EnvType.CLIENT && gmCandidate.name.equals("run")) {
 					// For pre-classic, try to find the "Failed to start RubyDung" log message
 					// that is shown if the init() method throws an exception, then patch said
 					// init() method.
@@ -266,7 +265,7 @@ public class EntrypointPatch extends GamePatch {
 					}
 				}
 
-				if (type == EnvType.CLIENT && !isApplet && gameMethodQuality < 2) {
+				if (type == EnvType.CLIENT && gameMethodQuality < 2) {
 					// Try to find a method with an LDC string "LWJGL Version: ".
 					// This is the "init()" method, or as of 19w38a is the constructor, or called somewhere in that vicinity,
 					// and is by far superior in hooking into for a well-off mod start.
@@ -473,54 +472,6 @@ public class EntrypointPatch extends GamePatch {
 
 				patched = true;
 			}
-		} else if (type == EnvType.CLIENT && isApplet) {
-			// Applet-side: field is private static File, run at end
-			// At the beginning, set file field (hook)
-			FieldNode runDirectory = findField(gameClass, (f) -> isStatic(f.access) && f.desc.equals("Ljava/io/File;"));
-
-			if (runDirectory == null) {
-				// TODO: Handle pre-indev versions.
-				//
-				// Classic has no agreed-upon run directory.
-				// - level.dat is always stored in CWD. We can assume CWD is set, launchers generally adhere to that.
-				// - options.txt in newer Classic versions is stored in user.home/.minecraft/. This is not currently handled,
-				// but as these versions are relatively low on options this is not a huge concern.
-				Log.warn(LogCategory.GAME_PATCH, "Could not find applet run directory! (If you're running pre-late-indev versions, this is fine.)");
-
-				ListIterator<AbstractInsnNode> it = gameMethod.instructions.iterator();
-
-				if (gameConstructor == gameMethod) {
-					moveBefore(it, Opcodes.RETURN);
-				}
-
-				/*it.add(new TypeInsnNode(Opcodes.NEW, "java/io/File"));
-					it.add(new InsnNode(Opcodes.DUP));
-					it.add(new LdcInsnNode("."));
-					it.add(new MethodInsnNode(Opcodes.INVOKESPECIAL, "java/io/File", "<init>", "(Ljava/lang/String;)V", false)); */
-				it.add(new InsnNode(Opcodes.ACONST_NULL));
-				it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/fabricmc/loader/impl/game/minecraft/applet/AppletMain", "hookGameDir", "(Ljava/io/File;)Ljava/io/File;", false));
-				it.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				finishEntrypoint(type, it);
-			} else {
-				// Indev and above.
-				ListIterator<AbstractInsnNode> it = gameConstructor.instructions.iterator();
-				moveAfter(it, Opcodes.INVOKESPECIAL); /* Object.init */
-				it.add(new FieldInsnNode(Opcodes.GETSTATIC, gameClass.name, runDirectory.name, runDirectory.desc));
-				it.add(new MethodInsnNode(Opcodes.INVOKESTATIC, "net/fabricmc/loader/impl/game/minecraft/applet/AppletMain", "hookGameDir", "(Ljava/io/File;)Ljava/io/File;", false));
-				it.add(new FieldInsnNode(Opcodes.PUTSTATIC, gameClass.name, runDirectory.name, runDirectory.desc));
-
-				it = gameMethod.instructions.iterator();
-
-				if (gameConstructor == gameMethod) {
-					moveBefore(it, Opcodes.RETURN);
-				}
-
-				it.add(new FieldInsnNode(Opcodes.GETSTATIC, gameClass.name, runDirectory.name, runDirectory.desc));
-				it.add(new VarInsnNode(Opcodes.ALOAD, 0));
-				finishEntrypoint(type, it);
-			}
-
-			patched = true;
 		} else {
 			// Client-side:
 			// - if constructor, identify runDirectory field + location, run immediately after
@@ -590,9 +541,6 @@ public class EntrypointPatch extends GamePatch {
 			classEmitter.accept(mainClass);
 		}
 
-		if (isApplet) {
-			Hooks.appletMainClass = entrypoint;
-		}
 	}
 
 	private boolean hasSuperClass(String cls, String superCls, Function<String, ClassNode> classSource) {

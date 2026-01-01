@@ -28,8 +28,6 @@ import net.fabricmc.loader.impl.util.log.LogCategory;
 public final class Hooks {
 	public static final String INTERNAL_NAME = Hooks.class.getName().replace('.', '/');
 
-	public static String appletMainClass;
-
 	public static final String FABRIC = "fabric";
 	public static final String VANILLA = "vanilla";
 
