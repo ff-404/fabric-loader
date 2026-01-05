@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
-import net.fabricmc.loader.api.MappingResolver;
 
 public class TestEntrypoint implements ModInitializer {
 	public static final Logger LOGGER = LoggerFactory.getLogger("minecraft-test");
@@ -29,8 +28,5 @@ public class TestEntrypoint implements ModInitializer {
 	@Override
 	public void onInitialize() {
 		LOGGER.info("Hello Fabric world!");
-
-		MappingResolver mappingResolver = FabricLoader.getInstance().getMappingResolver();
-		LOGGER.info(mappingResolver.mapClassName("intermediary", "net.minecraft.class_310"));
 	}
 }

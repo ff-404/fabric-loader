@@ -44,7 +44,6 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.classtweaker.api.ClassTweaker;
 import net.fabricmc.classtweaker.api.ClassTweakerReader;
 import net.fabricmc.loader.api.LanguageAdapter;
-import net.fabricmc.loader.api.MappingResolver;
 import net.fabricmc.loader.api.ModContainer;
 import net.fabricmc.loader.api.ObjectShare;
 import net.fabricmc.loader.api.entrypoint.EntrypointContainer;
@@ -238,8 +237,6 @@ public final class FabricLoaderImpl implements FabricLoader {
 
 		Path cacheDir = gameDir.resolve(CACHE_DIR_NAME);
 		Path outputdir = cacheDir.resolve(PROCESSED_MODS_DIR_NAME);
-
-		// runtime mod remapping
 
 		// shuffle mods in-dev to reduce the risk of false order reliance, apply late load requests
 
