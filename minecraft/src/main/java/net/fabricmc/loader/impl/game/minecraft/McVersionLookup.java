@@ -361,7 +361,9 @@ public final class McVersionLookup {
 			int year = Integer.parseInt(matcher.group(1));
 			int week = Integer.parseInt(matcher.group(2));
 
-			if (year == 25 && week >= 41 || year > 25) {
+			if (year == 26 && week == 14) {
+				return "26.1.1"; // 2026 April fools snapshot
+			} else if (year == 25 && week >= 41 || year > 25) {
 				return "1.21.11";
 			} else if (year == 25 && week >= 31 && week <= 37) {
 				return "1.21.9";
@@ -922,16 +924,23 @@ public final class McVersionLookup {
 			// 2.0 update version as known in the jar, forked from 1.5.1
 			return "1.5.2-2.0";
 
+		case "2.0-preview":
+			// a preview for the 2.0 april fools version, similar to blue
+			return "1.5.2-2.0+preview";
+
+		case "2.0-red":
 		case "2point0_red":
 		case "af-2013-red":
 			// 2.0 update version red, forked from 1.5.1
 			return "1.5.2-2.0+red";
 
+		case "2.0-purple":
 		case "2point0_purple":
 		case "af-2013-purple":
 			// 2.0 update version purple, forked from 1.5.1
 			return "1.5.2-2.0+purple";
 
+		case "2.0-blue":
 		case "2point0_blue":
 		case "af-2013-blue":
 			// 2.0 update version blue, forked from 1.5.1
@@ -1056,6 +1065,10 @@ public final class McVersionLookup {
 		case "1.16_combat-6":
 			// The ninth Combat Test 8c, forked from 1.16.2
 			return "1.16.3-combat.8.c";
+
+		case "26w14a":
+			// 2026 April fools version, forked from 1.26.1
+			return "26.1.1-alpha.26.14.a";
 
 		default:
 			return null; //Don't recognise the version
